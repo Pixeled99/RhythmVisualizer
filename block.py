@@ -1,12 +1,6 @@
 import pygame
+from base_object import Base
 
-class Block:
-    def __init__(self, left, top, width, height):
-        self.left = left
-        self.top = top
-        self.width = width
-        self.height = height
-        self.rect = pygame.Rect(left, top, width, height)
-
+class Block(Base):
     def draw(self, screen : pygame.Surface):
-        pygame.draw.rect(screen, (0,0,0), self.rect, 5)
+        pygame.draw.rect(screen, (0,0,0), pygame.Rect(self.left, self.top, self.width, self.height), 5)
