@@ -1,6 +1,5 @@
 import pygame
 from block import Block
-from wall import Wall
 
 pygame.init()
 screen = pygame.display.set_mode((250, 600))
@@ -9,9 +8,9 @@ running = True
 
 block = Block(screen.get_width()/2 - 25, screen.get_height()/2 - 25, 50, 50)
 
-left_wall = Wall(0, 0, 20, screen.get_height(), True)
+left_wall_border = 5
 
-right_wall = Wall(screen.get_width()-20, 0, 20, screen.get_height(), True)
+right_wall_border = 5
 
 velocity = [1,1]
 
@@ -24,11 +23,17 @@ while running:
 
     block.draw(screen)
 
-    left_wall.update(velocity, block, screen)
-    left_wall.draw(screen)
+    pygame.draw.rect(screen, (0,0,0), pygame.Rect(0, 0, left_wall_border, screen.get_height())) # left wall
 
-    right_wall.update(velocity, block, screen)
-    right_wall.draw(screen)
+    pygame.draw.rect(screen, (0,0,0), pygame.Rect(screen.get_width()-right_wall_border, 0, right_wall_border, screen.get_height())) # right wall
+
+    right_wall_border += velocity[0]
+    left_wall_border -= velocity[0]
+
+    if right_wall_border >= block.left:
+        velocity[0] *= -1
+    if left_wall_border >= block.left:
+        velocity[0] *= -1
 
     pygame.display.flip()
 
