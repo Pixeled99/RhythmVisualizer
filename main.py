@@ -1,10 +1,22 @@
 import pygame
 import threading
 from block import Block
-from note import Note
 from convert import convert
+import sys
 
-timings = convert("test.mid", 1)
+track = 0
+
+path = "test.mid"
+
+if len(sys.argv) == 2:
+    path = sys.argv[1]
+elif len(sys.argv) == 3:
+    path = sys.argv[1]
+    track = int(sys.argv[2])
+
+timings = convert(path, track)
+
+print(path, track, len(timings))
 
 for index, note in enumerate(timings):
     note.total_length = timings[(index+1)%len(timings)].end
