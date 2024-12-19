@@ -1,7 +1,13 @@
 import pygame
+import threading
 from block import Block
 from note import Note
-import threading
+from convert import convert
+
+timings = convert("test.mid", 1)
+
+for index, note in enumerate(timings):
+    note.total_length = timings[(index+1)%len(timings)].end
 
 pygame.init()
 screen = pygame.display.set_mode((250, 600))
@@ -11,12 +17,6 @@ running = True
 block = Block(screen.get_width()/2 - 25, screen.get_height()/2 - 25, 50, 50)
 
 channel = pygame.mixer.find_channel()
-
-timings = [
-    Note(440, 1, 2),
-    Note(440, 1, 2),
-    Note(523.25, 0.5, 1)
-]
 
 index = 0
 
@@ -45,25 +45,22 @@ while running:
 
     text_surface = my_font.render(str(clock.get_fps())[:5], False, (255, 0, 0))
     screen.blit(text_surface, (0, 0))
-    text_surface = my_font.render(str(left_wall_border), False, (255, 0, 0))
-    screen.blit(text_surface, (0, screen.get_height()-text_surface.get_height()))
-    text_surface = my_font.render(str(right_wall_border), False, (255, 0, 0))
-    screen.blit(text_surface, (screen.get_width()-text_surface.get_width(), screen.get_height()-text_surface.get_height()))
 
     bip += 1
 
     if right_wall_border >= block.left or left_wall_border >= block.left:
-        threading.Thread(target=timings[index % len(timings)].play, daemon=True).start()
+        offset = 0
+        while timings[index + offset].start == timings[index].start:
+            threading.Thread(target=timings[index+offset].play, daemon=True).start()
+            offset+=1
         if right_wall_border < left_wall_border:
-            right_wall_border = -((timings[index % len(timings)].total_length * 300) - 100)
+            right_wall_border = -(((timings[index+offset].start-timings[index].start) * 300) - 100)
             pass
         else:
-            left_wall_border = -((timings[index % len(timings)].total_length * 300) - 100)
+            left_wall_border = -(((timings[index+offset].start-timings[index].start) * 300) - 100)
             pass
         velocity[0] *= -1
-        print(bip/60)
-        bip = 0
-        index += 1
+        index += offset
 
     right_wall_border += velocity[0]
     left_wall_border -= velocity[0]
