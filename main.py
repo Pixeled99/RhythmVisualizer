@@ -16,8 +16,6 @@ elif len(sys.argv) == 3:
 
 timings = convert(path, track)
 
-print(path, track, len(timings))
-
 for index, note in enumerate(timings):
     note.total_length = timings[(index+1)%len(timings)].end
 
